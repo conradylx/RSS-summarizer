@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file="../.env", extra="ignore")
     database_url: str
     redis_url: str
+    ollama_url: str = "http://ollama:11434/v1"
 
 
 settings = Settings()  # type: ignore

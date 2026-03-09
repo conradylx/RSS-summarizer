@@ -24,7 +24,7 @@ async def create_feed(
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Feed already exists")
 
-    feed = Feed(url=str(data.url))
+    feed = Feed(url=str(data.url), title=data.title or "New Feed")
     db.add(feed)
     await db.commit()
     await db.refresh(feed)
