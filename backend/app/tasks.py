@@ -6,7 +6,8 @@ from app.celery_utils import run_async_in_celery
 from app.database import AsyncSessionLocal
 from app.worker import celery_app
 from app.models import Feed, Article
-
+from app.broadcast import publish_article
+from app.database import AsyncSessionLocal
 
 async def _fetch_feed(feed_id: int) -> None:
     async with AsyncSessionLocal() as db:
@@ -17,6 +18,8 @@ async def _fetch_feed(feed_id: int) -> None:
         parsed = feedparser.parse(feed.url)
         if not feed.title and parsed.feed.get("title"):
             feed.title = parsed.feed.title
+
+        new_articles = list()
         for entry in parsed.entries:
             link = entry.get("link")
             guid = entry.get("id") or entry.get("guid")
@@ -45,7 +48,24 @@ async def _fetch_feed(feed_id: int) -> None:
             )
             article.summary = summarize(article.content)
             db.add(article)
+            new_articles.append(article)
         await db.commit()
+
+        for article in new_articles:
+            await db.refresh(article)
+            await publish_article(
+                {
+                    "id": article.id,
+                    "title": article.title,
+                    "url": article.url,
+                    "summary": article.summary,
+                    "published_at": (
+                        str(article.published_at)
+                        if article.published_at
+                        else None
+                    ),
+                }
+            )
 
 
 async def _fetch_all_feeds() -> None:

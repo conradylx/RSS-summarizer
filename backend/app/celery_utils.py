@@ -1,13 +1,7 @@
 import asyncio
-from typing import Awaitable
+from collections.abc import Coroutine
+from typing import Any
 
 
-def run_async_in_celery(coro: Awaitable) -> None:
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    future = asyncio.ensure_future(coro)
-    loop.run_until_complete(future)
+def run_async_in_celery(coro: Coroutine[Any, Any, None]) -> None:
+    asyncio.run(coro)
