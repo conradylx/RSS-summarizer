@@ -1,5 +1,13 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:5173",
+    "http://100.93.37.11:5173",
+    "http://100.93.37.11:8080",
+]
+
 
 class Settings(BaseSettings):
     """Reads configuration from .env file."""

@@ -11,7 +11,7 @@ services:
     volumes:
       - ./backend:/app
     restart: always
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     depends_on:
       postgres:
         condition: service_healthy
@@ -22,8 +22,24 @@ services:
     networks:
       - app_network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - 5173:5173
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: always
+    command: npm run dev -- --host
+
   postgres: 
     image: postgres:latest
+    container_name: postgres
     env_file:
       - .env
     ports:
@@ -40,6 +56,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: redis
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       interval: 1s
@@ -57,13 +74,16 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: celery -A app.worker.celery_app worker --loglevel=info
+    container_name: worker
+    command: celery -A app.worker.celery_app worker --loglevel=info --concurrency=1
     volumes:
       - ./backend:/app
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     env_file:
       - .env
@@ -74,11 +94,17 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: beat
     command: celery -A app.worker.celery_app beat --loglevel=info
     volumes:
       - ./backend:/app
     depends_on:
-      - worker
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      worker:
+        condition: service_started
     env_file:
       - .env
     networks:
@@ -86,13 +112,23 @@ services:
 
   ollama:
     image: ollama/ollama:latest
+    container_name: ollama
     ports:
       - 11434:11434
     volumes:
       - ollama_data:/root/.ollama
+    entrypoint:
+      - sh
+      - -c
+      - |
+        ollama serve &
+        sleep 5 &&
+        ollama pull llama3.2:1b &&
+        wait
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:11434/v1/models || exit 1"]
-      interval: 5s
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 10s
       retries: 5
     networks:
       - app_network

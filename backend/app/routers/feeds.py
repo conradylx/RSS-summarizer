@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.tasks import fetch_feed
 from app.database import get_db
 from app.models import Feed
 from app.schemas import FeedCreate, FeedResponse
@@ -28,6 +29,7 @@ async def create_feed(
     db.add(feed)
     await db.commit()
     await db.refresh(feed)
+    fetch_feed.delay(feed.id)  # type: ignore[attr-defined]
     return feed
 
 

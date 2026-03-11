@@ -17,7 +17,9 @@ class Feed(Base):
     )
 
     articles: Mapped[list["Article"]] = relationship(
-        back_populates="feed", lazy="selectin"
+        back_populates="feed",
+        lazy="selectin",
+        cascade="all, delete-orphan",
     )
 
 
@@ -26,7 +28,7 @@ class Article(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     feed_id: Mapped[int] = mapped_column(
-        ForeignKey("feeds.id", ondelete="CASCADE")
+        ForeignKey("feeds.id", ondelete="CASCADE"),
     )
     title: Mapped[str] = mapped_column(String(500))
     url: Mapped[str] = mapped_column(String(1000), unique=True)

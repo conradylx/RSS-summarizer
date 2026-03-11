@@ -5,14 +5,16 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = (
-    "Summarize the following article in 2-3 sentences "
-    "in the same language as the article."
+    "You are a text summarization tool. "
+    "Your only job is to summarize the provided text in 3-4 sentences in the same language as the text. "
+    "Never refuse, never ask questions, never add commentary."
+    "Just output the summary and nothing else."
 )
 
 client = OpenAI(
     base_url=settings.ollama_url,
     api_key="ollama",
-    timeout=60.0,
+    timeout=120.0,
 )
 
 
@@ -22,10 +24,10 @@ def summarize(text: str) -> str:
 
     try:
         response = client.chat.completions.create(
-            model="llama3.2",
+            model="llama3.2:1b",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": text[:2000]},
+                {"role": "user", "content": text[:1000]},
             ],
             max_tokens=150,
             temperature=0.3,
