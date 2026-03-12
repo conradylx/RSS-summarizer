@@ -21,17 +21,13 @@ async def _fetch_feed(feed_id: int) -> None:
             return
 
         parsed = feedparser.parse(feed.url)
-        logger.info(
-            f"[{feed_id}] Parsed {len(parsed.entries)} entries from {feed.url}"
-        )
+        logger.info(f"[{feed_id}] Parsed {len(parsed.entries)} entries from {feed.url}")
 
         if not feed.title and parsed.feed.get("title"):
             feed.title = parsed.feed.title
             await db.commit()
 
-        existing_urls = set(
-            (await db.execute(select(Article.url))).scalars().all()
-        )
+        existing_urls = set((await db.execute(select(Article.url))).scalars().all())
 
     new_count = 0
     for entry in parsed.entries:
@@ -79,9 +75,7 @@ async def _fetch_feed(feed_id: int) -> None:
                     "url": article.url,
                     "summary": article.summary,
                     "published_at": (
-                        str(article.published_at)
-                        if article.published_at
-                        else None
+                        str(article.published_at) if article.published_at else None
                     ),
                 }
             )

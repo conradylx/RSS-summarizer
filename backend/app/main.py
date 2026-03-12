@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import feeds, articles, ws
 from app.config import ALLOWED_ORIGINS
 
-
 app = FastAPI(title="RSS Summarizer")
 app.add_middleware(
     CORSMiddleware,

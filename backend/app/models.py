@@ -12,9 +12,7 @@ class Feed(Base):
     title: Mapped[str | None] = mapped_column(
         String(200), default="Untitled Feed", nullable=True
     )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     articles: Mapped[list["Article"]] = relationship(
         back_populates="feed",
@@ -34,11 +32,7 @@ class Article(Base):
     url: Mapped[str] = mapped_column(String(1000), unique=True)
     content: Mapped[str | None] = mapped_column(Text, nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    published_at: Mapped[datetime | None] = mapped_column(
-        DateTime, nullable=True
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
+    published_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     feed: Mapped["Feed"] = relationship(back_populates="articles")

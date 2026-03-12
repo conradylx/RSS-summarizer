@@ -1,7 +1,6 @@
 from celery import Celery
 from app.config import settings
 
-
 celery_app = Celery(
     "RSSsummarizer",
     broker=settings.redis_url,
@@ -9,9 +8,7 @@ celery_app = Celery(
     include=["app.tasks"],
 )
 
-celery_app.conf.update(
-    task_serializer="json", result_serializer="json", timezone="UTC"
-)
+celery_app.conf.update(task_serializer="json", result_serializer="json", timezone="UTC")
 celery_app.conf.beat_schedule = {
     "fetch-all-feeds-every-10-minutes": {
         "task": "app.tasks.fetch_all_feeds",
