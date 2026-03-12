@@ -18,9 +18,7 @@ async def list_feeds(db: Annotated[AsyncSession, Depends(get_db)]):
 
 
 @router.post("/", response_model=FeedResponse)
-async def create_feed(
-    data: FeedCreate, db: Annotated[AsyncSession, Depends(get_db)]
-):
+async def create_feed(data: FeedCreate, db: Annotated[AsyncSession, Depends(get_db)]):
     existing = await db.execute(select(Feed).where(Feed.url == str(data.url)))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Feed already exists")
@@ -34,9 +32,7 @@ async def create_feed(
 
 
 @router.delete("/{feed_id}", status_code=204)
-async def delete_feed(
-    feed_id: int, db: Annotated[AsyncSession, Depends(get_db)]
-):
+async def delete_feed(feed_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
     result = await db.execute(select(Feed).where(Feed.id == feed_id))
     feed = result.scalar_one_or_none()
     if not feed:

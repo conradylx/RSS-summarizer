@@ -23,9 +23,7 @@ async def get_articles(
 
 
 @router.get("/{article_id}", response_model=ArticleResponse)
-async def get_article(
-    article_id: int, db: Annotated[AsyncSession, Depends(get_db)]
-):
+async def get_article(article_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
     result = await db.execute(select(Article).where(Article.id == article_id))
     article = result.scalar_one_or_none()
     if not article:
