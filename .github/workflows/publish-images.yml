@@ -1,0 +1,39 @@
+name: Publish images to GHCR
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image tags
+        id: meta
+        run: |
+          echo "SHA_TAG=sha-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Build and push backend
+        run: |
+          docker build -t ghcr.io/conradylx/rss-summarizer-backend:latest -t ghcr.io/conradylx/rss-summarizer-backend:${{ steps.meta.outputs.SHA_TAG }} ./backend
+          docker push ghcr.io/conradylx/rss-summarizer-backend:latest
+          docker push ghcr.io/conradylx/rss-summarizer-backend:${{ steps.meta.outputs.SHA_TAG }}
+
+      - name: Build and push frontend
+        run: |
+          docker build -t ghcr.io/conradylx/rss-summarizer-frontend:latest -t ghcr.io/conradylx/rss-summarizer-frontend:${{ steps.meta.outputs.SHA_TAG }} ./frontend
+          docker push ghcr.io/conradylx/rss-summarizer-frontend:latest
+          docker push ghcr.io/conradylx/rss-summarizer-frontend:${{ steps.meta.outputs.SHA_TAG }}

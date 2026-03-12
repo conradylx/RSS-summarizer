@@ -20,7 +20,7 @@ jobs:
             - run: pip install poetry
             - run: poetry install --no-root
             - run: poetry run black --check .
-    lint-frontend:
+    frontend-checks:
         runs-on: ubuntu-latest
         defaults:
             run:
