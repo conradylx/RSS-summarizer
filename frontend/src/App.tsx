@@ -7,6 +7,7 @@ import { useWebSocket, type FeedStatus } from "./useWebsocket";
 const STATUS_LABEL: Record<FeedStatus["status"], string> = {
   fetching: "⏳ Downloading...",
   summarizing: "🤖 Summarizing",
+  done: "Done",
 };
 
 function App() {
@@ -43,7 +44,15 @@ function App() {
 
   const handleStatus = useCallback(
     (feed_id: number, statusInfo: FeedStatus) => {
-      setFeedStatuses((prev) => ({ ...prev, [feed_id]: statusInfo }));
+      if (statusInfo.status === "done") {
+        setFeedStatuses((prev) => {
+          const next = { ...prev };
+          delete next[feed_id];
+          return next;
+        });
+      } else {
+        setFeedStatuses((prev) => ({ ...prev, [feed_id]: statusInfo }));
+      }
     },
     [],
   );

@@ -25,7 +25,7 @@ async function createFeed(url: string, title?: string): Promise<Feed> {
 }
 
 async function deleteFeed(id: number) {
-  const response = await fetch(`${API_URL}/feeds/${id}/`, {
+  const response = await fetch(`${API_URL}/feeds/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -35,7 +35,6 @@ async function deleteFeed(id: number) {
     return response.json();
   }
 }
-
 
 async function fetchArticles(feedId?: number): Promise<Article[]> {
   const url = feedId

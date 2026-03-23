@@ -41,9 +41,7 @@ async def test_create_feed_returns_409_for_duplicate(client):
 
     app.dependency_overrides[get_db] = fake_db
 
-    response = await client.post(
-        "/feeds/", json={"url": "https://example.com/rss"}
-    )
+    response = await client.post("/feeds/", json={"url": "https://example.com/rss"})
     assert response.status_code == 409
 
     app.dependency_overrides.clear()

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import type { Article } from "./types";
 
 type FeedStatus = {
-  status: "fetching" | "summarizing";
+  status: "fetching" | "summarizing" | "done";
   title?: string;
 };
 
@@ -43,6 +43,10 @@ export function useWebSocket({ onArticle, onStatus }: UseWebSocketProps) {
 
       ws.onclose = () => {
         setTimeout(connect, 3000);
+      };
+
+      ws.onerror = () => {
+        console.warn("WebSocket error, will reconnect...");
       };
 
       wsRef.current = ws;
