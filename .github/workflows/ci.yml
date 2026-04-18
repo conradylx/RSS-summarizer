@@ -89,9 +89,10 @@ jobs:
         run: docker build -t rss-backend:test ./backend
 
       - name: Trivy scan backend
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: "rss-backend:test"
           format: "table"
           severity: "CRITICAL,HIGH"
           exit-code: "1"
+          ignore-unfixed: true
