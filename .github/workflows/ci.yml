@@ -89,7 +89,7 @@ jobs:
         run: docker build -t rss-backend:test ./backend
 
       - name: Trivy scan backend
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: "rss-backend:test"
           format: "table"
