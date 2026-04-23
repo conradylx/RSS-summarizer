@@ -1,48 +1,43 @@
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_call:
-
 jobs:
-    lint-backend:
-        runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: backend
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-python@v5
-              with:
-                python-version: '3.13'
-            - run: pip install poetry
-            - run: poetry install --no-root
-            - run: poetry run black --check .
-    lint-frontend:
-        runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: frontend
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v3
-              with:
-                node-version: '22'
-            - run: npm ci
-            - run: npm run build
-            - run: npm run lint
-
+  lint-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install poetry
+      - run: poetry install --no-root
+      - run: poetry run black --check .
+  lint-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
+      - uses: actions/checkout@v4
       - name: Build backend image
         run: docker build -t rss-backend:test ./backend
-
       - name: Trivy scan backend
         uses: aquasecurity/trivy-action@v0.35.0
         with:
