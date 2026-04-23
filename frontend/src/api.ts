@@ -1,6 +1,6 @@
 import type { Article, Feed } from "./types";
 
-const API_URL = "http://localhost:8000";
+const API_URL = "http://localhost:8000/api";
 
 async function fetchFeeds(): Promise<Feed[]> {
   const response = await fetch(`${API_URL}/feeds/`);
