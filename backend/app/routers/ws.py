@@ -1,5 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from app.config import ALLOWED_ORIGINS
+from app.config import settings
 from app.broadcast import subscribe_articles
 
 router = APIRouter()
@@ -8,7 +8,7 @@ router = APIRouter()
 @router.websocket("/ws/")
 async def websocket_endpoint(websocket: WebSocket):
     origin = websocket.headers.get("origin", "")
-    if origin not in ALLOWED_ORIGINS:
+    if origin not in settings.allowed_origins:
         await websocket.close(code=4403)
         return
 
