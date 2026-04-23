@@ -11,11 +11,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(feeds.router)
-app.include_router(articles.router)
-app.include_router(ws.router)
+app.include_router(feeds.router, prefix="/api")
+app.include_router(articles.router, prefix="/api")
+app.include_router(ws.router, prefix="/api")
 
 
-@app.get("/healthcheck")
+@app.get("/api/healthcheck")
 def healthcheck():
     return {"status": "healthy"}
