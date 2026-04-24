@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from app.routers import feeds, articles, ws
 from app.config import settings
 
@@ -11,6 +12,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+Instrumentator().instrument(app).expose(app)
 app.include_router(feeds.router, prefix="/api")
 app.include_router(articles.router, prefix="/api")
 app.include_router(ws.router, prefix="/api")
