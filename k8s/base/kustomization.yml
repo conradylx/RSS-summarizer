@@ -13,3 +13,4 @@ resources:
   - ingress.yml
   - beat.yml
   - worker-deployment.yml
+  - network-policies.yml
