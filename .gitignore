@@ -22,3 +22,6 @@ celerybeat-schedule-wal
 # IDE
 .idea
 .vscode
+
+# K8s
+k8s/secrets.yml
