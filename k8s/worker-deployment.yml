@@ -1,53 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rss-backend
+  name: rss-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rss-backend
+      app: rss-worker
   template:
     metadata:
       labels:
-        app: rss-backend
+        app: rss-worker
     spec:
       imagePullSecrets:
         - name: ghcr-secret
       containers:
-        - name: backend
+        - name: worker
           image: ghcr.io/conradylx/rss-summarizer-backend:latest
           imagePullPolicy: Always
-          ports:
-            - containerPort: 8000
+          command: ["celery", "-A", "app.worker.celery_app", "worker", "--loglevel=info", "--concurrency=1"]
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  key: DATABASE_URL
                   name: db-credentials
+                  key: DATABASE_URL
             - name: REDIS_URL
               valueFrom:
                 configMapKeyRef:
-                  key: REDIS_URL
                   name: app-config
+                  key: REDIS_URL
             - name: OLLAMA_URL
               valueFrom:
                 configMapKeyRef:
-                  key: OLLAMA_URL
                   name: app-config
-          readinessProbe:
-            httpGet:
-              path: /healthcheck
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /healthcheck
-              port: 8000
-            initialDelaySeconds: 15
-            periodSeconds: 20
+                  key: OLLAMA_URL
           resources:
             limits:
               cpu: "500m"
